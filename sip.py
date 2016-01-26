@@ -1,12 +1,34 @@
+import urllib.request
 from tkinter import *
+from re import I, compile, findall
 import xml.etree.ElementTree as etree
 
 tree = etree.parse("C:\Temp\config.xml")
 root = tree.getroot()
-massiv = []
 phoneslist = []
-phoneslist.append({'admin':'8950232266', 'test':'89510232323', 'pupok':'89510222222'})
+ip_str = ('http://' + root[1].text + '/pdir.htm').replace("\n","")
+print(ip_str)
+req = urllib.request.Request(ip_str)
+with urllib.request.urlopen(req) as response:
+	the_page = response.read()
+st = "".join(map(chr, the_page))
+massiv = compile(r'name="([^"]*)" value="([^"]*)"', I).findall(st)
+massiv2 = {}
+pattern = re.compile('(n=[\d]+).*(p=[\d\.])')
 
+
+
+for phone in massiv:
+	
+	
+	
+	name = compile(r'n=([^]*);p=([^]*)', I).findall(phone[1])
+	phn = compile(r'p=([^]*); p=([^]*)', I).findall(phone[1])
+	
+	phoneslist.append(name + phn)
+	
+	
+	
 
 for el in root:
 	massiv.append(el.text)
@@ -22,7 +44,7 @@ def phonesRefr():
 
 def XmlSave(ip):
 	massiv[1] = ip
-	root[1].text = ip
+	root[1].text = ip.replace("\n","")
 	etree.ElementTree(root).write("C:\Temp\config.xml")
 	
 def test():
